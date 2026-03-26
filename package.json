@@ -25,6 +25,7 @@
     "@nestjs/microservices": "^11.1.17",
     "@nestjs/mongoose": "^11.0.4",
     "@nestjs/platform-express": "^11.0.1",
+    "axios": "^1.13.6",
     "eureka-js-client": "^4.5.0",
     "kafkajs": "^2.2.4",
     "mongoose": "^9.3.1",
