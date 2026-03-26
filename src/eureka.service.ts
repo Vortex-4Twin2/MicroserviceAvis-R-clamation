@@ -31,16 +31,13 @@ export class EurekaService implements OnModuleInit {
         },
       },
 
-      eureka: {
-        host: 'localhost',
-        port: 8761,
-
-        // ✅ CORRECTION ICI
-        servicePath: '/eureka/',
-
-        maxRetries: 10,
-        requestRetryDelay: 2000,
-      },
+     eureka: {
+  host: 'localhost',
+  port: 8761,
+  servicePath: '/eureka/apps/',
+  maxRetries: 10,
+  requestRetryDelay: 2000,
+}
     });
 
     client.start((error) => {
