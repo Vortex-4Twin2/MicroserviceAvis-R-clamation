@@ -3,26 +3,26 @@ import { Document } from 'mongoose';
 
 export type AvisDocument = Avis & Document;
 
-@Schema()
+@Schema({ timestamps: true }) // 🔥 important
 export class Avis {
 
-  @Prop()
+  @Prop({ required: true })
   commandeId: string;
 
-  @Prop()
+  @Prop({ required: true })
   livraisonId: string;
 
-  @Prop()
+  @Prop({ default: 'AUTO' })
   clientId: string;
 
-  @Prop()
+  @Prop({ default: '' })
   commentaire: string;
 
-  @Prop()
+  @Prop({ default: 5 })
   note: number;
 
-  @Prop()
-  type: string; // AVIS ou RECLAMATION
+  @Prop({ enum: ['AVIS', 'RECLAMATION'], default: 'AVIS' })
+  type: string;
 }
 
 export const AvisSchema = SchemaFactory.createForClass(Avis);

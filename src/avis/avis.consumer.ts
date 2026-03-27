@@ -8,7 +8,9 @@ export class AvisConsumer {
   constructor(private readonly avisService: AvisService) {}
 
   @EventPattern('livraison_livree')
-  async handleLivraison(@Payload() data: any) {
+  async handleLivraison(@Payload() message: any) {
+
+    const data = message.value || message; // 🔥 fix kafka format
 
     console.log("🔥 Message reçu depuis Kafka :", data);
 
@@ -16,8 +18,8 @@ export class AvisConsumer {
       commandeId: data.orderId,
       livraisonId: data.id,
       clientId: "AUTO",
-      commentaire: "",
-      note: 0,
+      commentaire: "Livraison effectuée automatiquement",
+      note: 5,
       type: "AVIS"
     });
   }
