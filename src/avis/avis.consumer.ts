@@ -15,7 +15,7 @@ export class AvisConsumer {
     console.log("🔥 Message reçu depuis Kafka :", data);
 
     await this.avisService.create({
-      commandeId: data.orderId,
+      commandeId: data.orderId || "NO_ORDER",
       livraisonId: data.id,
       clientId: "AUTO",
       commentaire: "Livraison effectuée automatiquement",
