@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Transport } from '@nestjs/microservices';
 import { ExternalConfigService } from './config/external-config.service';
+import { Partitioners } from 'kafkajs';
 
 async function bootstrap() {
 
@@ -24,6 +25,9 @@ async function bootstrap() {
       },
       consumer: {
         groupId: 'avis-consumer',
+      },
+      producer: {
+        createPartitioner: Partitioners.LegacyPartitioner,
       },
     },
   });

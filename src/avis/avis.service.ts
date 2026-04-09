@@ -1,24 +1,46 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Avis } from './avis.schema';
+import axios from 'axios';
 
 @Injectable()
 export class AvisService {
+  private readonly logger = new Logger(AvisService.name);
+  private readonly PURGOMALUM_URL = 'https://www.purgomalum.com/service/json';
 
   constructor(@InjectModel(Avis.name) private avisModel: Model<Avis>) {}
 
-  // 🔵 Création générique + anti-duplicate
-  async create(data: any) {
+  // 🛡️ Advanced Business Logic: Profanity Filter
+  private async filterBadWords(text: string): Promise<string> {
+    if (!text || text.trim() === '') return text;
+    try {
+      const response = await axios.get(this.PURGOMALUM_URL, {
+        params: { text: text },
+      });
+      return response.data.result || text;
+    } catch (error) {
+      this.logger.error('Error calling PurgoMalum API:', error.message);
+      // Fallback: return original text if API fails (or you could block it)
+      return text;
+    }
+  }
 
-    // ✅ check duplication
+  // 🔵 Création générique + anti-duplicate + filtering
+  async create(data: any) {
+    // 🔍 1. Filtering bad words
+    if (data.commentaire) {
+      data.commentaire = await this.filterBadWords(data.commentaire);
+    }
+
+    // ✅ 2. Check duplication
     const exists = await this.avisModel.findOne({
       livraisonId: data.livraisonId,
-      type: 'AVIS'
+      type: 'AVIS',
     });
 
     if (exists) {
-      console.log("⚠️ Avis déjà existant pour cette livraison");
+      this.logger.warn(`⚠️ Avis déjà existant pour cette livraison: ${data.livraisonId}`);
       return exists;
     }
 
@@ -26,6 +48,11 @@ export class AvisService {
   }
 
   async createReclamation(data: any) {
+    // 🔍 Filtering bad words
+    if (data.commentaire) {
+      data.commentaire = await this.filterBadWords(data.commentaire);
+    }
+
     return this.avisModel.create({
       ...data,
       type: 'RECLAMATION',
@@ -41,6 +68,10 @@ export class AvisService {
   }
 
   async update(id: string, data: any) {
+    // 🔍 Filtering bad words if updated
+    if (data.commentaire) {
+      data.commentaire = await this.filterBadWords(data.commentaire);
+    }
     return this.avisModel.findByIdAndUpdate(id, data, { new: true });
   }
 
@@ -51,4 +82,4 @@ export class AvisService {
   async findByType(type: string) {
     return this.avisModel.find({ type });
   }
-}
+}
